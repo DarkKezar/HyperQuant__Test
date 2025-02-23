@@ -6,9 +6,16 @@ namespace Core.Connectors.TestConnector;
 
 public class TestRestConnector : ITestRestConnector
 {
+    private readonly HttpClient _httpClient;
+    
     private const string BaseUrl = "https://api-pub.bitfinex.com/v2/";
     private const string TradesUrl = "trades/";
     private const string CandlesUrl = "candles/";
+
+    public TestRestConnector(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
     
     /// <summary>
     /// Реализация метода для конкретной биржи. Хорошим решением было бы внедрение ряда зависимостей и промежуточного абстрактного класса, но об этом в условии не сообщалось
@@ -16,9 +23,8 @@ public class TestRestConnector : ITestRestConnector
     /// <exception cref="Exception">Люое возможное исключение "ломает" метод, в связи с чем считаю более логичным обрабатывать на верхних уровнях согласно бизнес логике и требованиям</exception>
     public async Task<IEnumerable<Trade>> GetNewTradesAsync(string pair, int maxCount, CancellationToken cancellationToken = default)
     {
-        using var client = new HttpClient();
         var endpointUrl = $"{BaseUrl}{TradesUrl}{pair}/hist?limit={maxCount}";
-        using var result = await client.GetAsync(endpointUrl, cancellationToken);
+        using var result = await _httpClient.GetAsync(endpointUrl, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {
@@ -43,10 +49,8 @@ public class TestRestConnector : ITestRestConnector
 
     public async Task<IEnumerable<Candle>> GetCandleSeriesAsync(CandleSeriesQuery query, CancellationToken cancellationToken = default)
     {
-        using var client = new HttpClient();
         var endpointUrl = $"{BaseUrl}{CandlesUrl}{query.ToUrlParams()}";
-        
-        using var result = await client.GetAsync(endpointUrl, cancellationToken);
+        using var result = await _httpClient.GetAsync(endpointUrl, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {
