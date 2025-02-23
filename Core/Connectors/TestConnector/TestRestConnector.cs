@@ -72,4 +72,9 @@ public class TestRestConnector : ITestRestConnector
             throw new Exception($"GetCandleSeriesAsync failed: {endpointUrl}", ex);
         }
     }
+
+    public void Dispose()
+    {
+        _httpClient.Dispose();
+    }
 }

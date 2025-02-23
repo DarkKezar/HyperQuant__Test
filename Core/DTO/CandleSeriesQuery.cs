@@ -95,4 +95,9 @@ public class CandleSeriesQuery
 
         return string.Join("", urlParts);
     }
+
+    public string ToWebSocketParams()
+    {
+        return $"trade:{ConvertSecondsToAllowedTimeFrame(PeriodInSec) ?? "1m"}:{Pair ?? string.Empty}";
+    }
 }

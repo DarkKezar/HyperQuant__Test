@@ -6,7 +6,7 @@ namespace Core.Connectors.TestConnector;
 /// <summary>
 /// Коннектор для REST запросов. По причине S из SOLID
 /// </summary>
-public interface ITestRestConnector
+public interface ITestRestConnector : IDisposable
 {
     /// <summary>
     /// Получение сделок

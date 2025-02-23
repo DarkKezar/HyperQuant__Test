@@ -6,7 +6,7 @@ namespace Core.Connectors.TestConnector;
 /// <summary>
 /// Коннектор для WS обновлений. По причине S из SOLID
 /// </summary>
-public interface ITestWSConnector
+public interface ITestWSConnector : IDisposable
 {
     /// <summary>
     /// NewBuyTrade может быть объединен с NewSellTrade.
