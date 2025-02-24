@@ -1,6 +1,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using Core.Constants;
 using Core.DTO;
 using Core.Models;
 
@@ -14,8 +15,6 @@ public class TestWsConnector : ITestWSConnector
     private readonly Dictionary<int, string?> _chanIdToPair = new Dictionary<int, string?>();
     private readonly Dictionary<int, string?> _chanIdToType = new Dictionary<int, string?>();
     
-    private const string WebSocketUrl = "wss://api-pub.bitfinex.com/ws/2";
-    
     public event Action<Trade>? NewBuyTrade;
     public event Action<Trade>? NewSellTrade;
     public event Action<Candle>? CandleSeriesProcessing;
@@ -28,7 +27,7 @@ public class TestWsConnector : ITestWSConnector
 
     public async Task ConnectWebSocketAsync()
     {
-        await _webSocket.ConnectAsync(new Uri(WebSocketUrl), 
+        await _webSocket.ConnectAsync(new Uri(BitfinexApiConstants.Urls.WebSocketUrl), 
             _cancellationTokenSource.Token);
         _ = ReceiveWebSocketMessagesAsync(_cancellationTokenSource.Token);
     }
@@ -43,8 +42,8 @@ public class TestWsConnector : ITestWSConnector
     {
         var wsMessage = new
         {
-            @event = "subscribe",
-            channel = "trades",
+            @event = BitfinexApiConstants.WebSocketData.Events.Subscribe,
+            channel = BitfinexApiConstants.WebSocketData.Channels.Trades,
             symbol = pair
         };
 
@@ -53,8 +52,13 @@ public class TestWsConnector : ITestWSConnector
 
     public void UnsubscribeTrades(string pair, CancellationToken cancellationToken = default)
     {
-        var tradesId = _chanIdToType.Where(kvp => kvp.Value.Equals("trades")).Select(kvp => kvp.Key).ToList();
-        var channelId = _chanIdToPair.Where(kvp => tradesId.Contains(kvp.Key)).FirstOrDefault(kvp => kvp.Value.Equals(pair)).Key;
+        var tradesId = _chanIdToType
+            .Where(kvp => kvp.Value.Equals(BitfinexApiConstants.WebSocketData.Channels.Trades))
+            .Select(kvp => kvp.Key)
+            .ToList();
+        var channelId = _chanIdToPair
+            .Where(kvp => tradesId.Contains(kvp.Key))
+            .FirstOrDefault(kvp => kvp.Value.Equals(pair)).Key;
 
         if (channelId > 0)
         {
@@ -63,7 +67,7 @@ public class TestWsConnector : ITestWSConnector
             
             var wsMessage = new
             {
-                @event = "unsubscribe",
+                @event = BitfinexApiConstants.WebSocketData.Events.Unsubscribe,
                 chanId = channelId
             };
 
@@ -78,8 +82,8 @@ public class TestWsConnector : ITestWSConnector
     {
         var wsMessage = new
         {
-            @event = "subscribe",
-            channel = "candles",
+            @event = BitfinexApiConstants.WebSocketData.Events.Subscribe,
+            channel = BitfinexApiConstants.WebSocketData.Channels.Candles,
             key = query.ToWebSocketParams()
         };
 
@@ -88,8 +92,13 @@ public class TestWsConnector : ITestWSConnector
 
     public void UnsubscribeCandles(string pair, CancellationToken cancellationToken = default)
     {
-        var candlesId = _chanIdToType.Where(kvp => kvp.Value.Equals("candles")).Select(kvp => kvp.Key).ToList();
-        var channelId = _chanIdToPair.Where(kvp => candlesId.Contains(kvp.Key)).FirstOrDefault(kvp => kvp.Value.Equals(pair)).Key;
+        var candlesId = _chanIdToType
+            .Where(kvp => kvp.Value.Equals(BitfinexApiConstants.WebSocketData.Channels.Candles))
+            .Select(kvp => kvp.Key)
+            .ToList();
+        var channelId = _chanIdToPair
+            .Where(kvp => candlesId.Contains(kvp.Key))
+            .FirstOrDefault(kvp => kvp.Value.Equals(pair)).Key;
 
         if (channelId > 0)
         {
@@ -98,7 +107,7 @@ public class TestWsConnector : ITestWSConnector
             
             var wsMessage = new
             {
-                @event = "unsubscribe",
+                @event = BitfinexApiConstants.WebSocketData.Events.Unsubscribe,
                 chanId = channelId
             };
 
@@ -135,17 +144,24 @@ public class TestWsConnector : ITestWSConnector
             {
                 using var doc = JsonDocument.Parse(message);
                 var root = doc.RootElement;
-
-                if (!root.GetProperty("event").GetString()!.Equals("subscribed")) return;
-                _chanIdToPair.Add(root.GetProperty("chanId").GetInt32(), root.GetProperty("pair").GetString());
-                _chanIdToType.Add(root.GetProperty("chanId").GetInt32(), root.GetProperty("channel").GetString());
+                
+                
+                var eventName = root.GetProperty(BitfinexApiConstants.WebSocketData.ResponseFields.Event).GetString();
+                if (!eventName!.Equals(BitfinexApiConstants.WebSocketData.Events.Subscribe)) return;
+                
+                var channelId = root.GetProperty(BitfinexApiConstants.WebSocketData.ResponseFields.ChannelId).GetInt32();
+                var pair = root.GetProperty(BitfinexApiConstants.WebSocketData.ResponseFields.Pair).GetString();
+                var channel = root.GetProperty(BitfinexApiConstants.WebSocketData.ResponseFields.Channel).GetString();
+                
+                _chanIdToPair.Add(channelId, pair);
+                _chanIdToType.Add(channelId, channel);
             }
             else
             {
                 var objs = JsonSerializer.Deserialize<List<object>>(message);
                 var type = _chanIdToType[Convert.ToInt32(objs[0].ToString())];
 
-                if (type.Equals("trades"))
+                if (type.Equals(BitfinexApiConstants.WebSocketData.Channels.Trades))
                 {
                     if (Convert.ToString(objs[1])[0] != '[')
                     {

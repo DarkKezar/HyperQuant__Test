@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Core.Constants;
 using Core.DTO;
 using Core.Models;
 
@@ -7,10 +8,6 @@ namespace Core.Connectors.TestConnector;
 public class TestRestConnector : ITestRestConnector
 {
     private readonly HttpClient _httpClient;
-    
-    private const string BaseUrl = "https://api-pub.bitfinex.com/v2/";
-    private const string TradesUrl = "trades/";
-    private const string CandlesUrl = "candles/";
 
     public TestRestConnector(HttpClient httpClient)
     {
@@ -23,7 +20,7 @@ public class TestRestConnector : ITestRestConnector
     /// <exception cref="Exception">Люое возможное исключение "ломает" метод, в связи с чем считаю более логичным обрабатывать на верхних уровнях согласно бизнес логике и требованиям</exception>
     public async Task<IEnumerable<Trade>> GetNewTradesAsync(string pair, int maxCount, CancellationToken cancellationToken = default)
     {
-        var endpointUrl = $"{BaseUrl}{TradesUrl}{pair}/hist?limit={maxCount}";
+        var endpointUrl = $"{BitfinexApiConstants.Urls.BaseUrl}{BitfinexApiConstants.Urls.Endpoints.Trades}{pair}/hist?limit={maxCount}";
         using var result = await _httpClient.GetAsync(endpointUrl, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
@@ -49,7 +46,7 @@ public class TestRestConnector : ITestRestConnector
 
     public async Task<IEnumerable<Candle>> GetCandleSeriesAsync(CandleSeriesQuery query, CancellationToken cancellationToken = default)
     {
-        var endpointUrl = $"{BaseUrl}{CandlesUrl}{query.ToUrlParams()}";
+        var endpointUrl = $"{BitfinexApiConstants.Urls.BaseUrl}{BitfinexApiConstants.Urls.Endpoints.Candles}{query.ToUrlParams()}";
         using var result = await _httpClient.GetAsync(endpointUrl, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
