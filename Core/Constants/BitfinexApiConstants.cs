@@ -36,4 +36,10 @@ public static class BitfinexApiConstants
             public const string Channel = "channel";
         }
     }
+
+    public static class Symbols
+    {
+        public const string BtcUsd = "tBTCUSD";
+        // e.t.c.
+    }
 }
