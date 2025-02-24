@@ -42,4 +42,22 @@ public class Candle
     /// Время
     /// </summary>
     public DateTimeOffset OpenTime { get; set; }
+
+    public Candle(string pair, object[] values)
+    {
+        if (values.Length == 6)
+        {
+            OpenTime = DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(values[0].ToString()) / 1000);
+
+            OpenPrice = Convert.ToDecimal(values[1].ToString());
+            ClosePrice = Convert.ToDecimal(values[2].ToString());
+            HighPrice = Convert.ToDecimal(values[3].ToString());
+            LowPrice = Convert.ToDecimal(values[4].ToString());
+            TotalVolume = (decimal)Convert.ToDouble(values[5].ToString());
+            
+            //By Formula?
+            //TotalPrice = Convert.ToDecimal(values[4]);
+        }
+        Pair = pair;
+    }
 }
