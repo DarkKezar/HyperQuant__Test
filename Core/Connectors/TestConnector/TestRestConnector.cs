@@ -13,7 +13,35 @@ public class TestRestConnector : ITestRestConnector
     {
         _httpClient = httpClient;
     }
-    
+
+    /// <summary>
+    /// Реализация метода для конкретной биржи. Хорошим решением было бы внедрение ряда зависимостей и промежуточного абстрактного класса, но об этом в условии не сообщалось
+    /// </summary>
+    /// <exception cref="Exception">Люое возможное исключение "ломает" метод, в связи с чем считаю более логичным обрабатывать на верхних уровнях согласно бизнес логике и требованиям</exception>
+    public async Task<Ticker> GetTickerAsync(string pair, CancellationToken cancellationToken = default)
+    {
+        var endpointUrl = $"{BitfinexApiConstants.Urls.BaseUrl}{BitfinexApiConstants.Urls.Endpoints.Ticker}{pair}";
+        using var result = await _httpClient.GetAsync(endpointUrl, cancellationToken);
+
+        if (!result.IsSuccessStatusCode)
+        {
+            throw new Exception($"GetTickerAsync failed: {endpointUrl}");
+        }
+
+        try
+        {
+            var response = await result.Content.ReadAsStringAsync(cancellationToken);
+            var data = JsonSerializer.Deserialize<object[]>(response);
+            var answer = new Ticker(pair, data);
+            
+            return answer;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"GetTickerAsync failed: {endpointUrl}", ex);
+        }
+    }
+
     /// <summary>
     /// Реализация метода для конкретной биржи. Хорошим решением было бы внедрение ряда зависимостей и промежуточного абстрактного класса, но об этом в условии не сообщалось
     /// </summary>
@@ -44,6 +72,10 @@ public class TestRestConnector : ITestRestConnector
         }
     }
 
+    /// <summary>
+    /// Реализация метода для конкретной биржи. Хорошим решением было бы внедрение ряда зависимостей и промежуточного абстрактного класса, но об этом в условии не сообщалось
+    /// </summary>
+    /// <exception cref="Exception">Люое возможное исключение "ломает" метод, в связи с чем считаю более логичным обрабатывать на верхних уровнях согласно бизнес логике и требованиям</exception>
     public async Task<IEnumerable<Candle>> GetCandleSeriesAsync(CandleSeriesQuery query, CancellationToken cancellationToken = default)
     {
         var endpointUrl = $"{BitfinexApiConstants.Urls.BaseUrl}{BitfinexApiConstants.Urls.Endpoints.Candles}{query.ToUrlParams()}";

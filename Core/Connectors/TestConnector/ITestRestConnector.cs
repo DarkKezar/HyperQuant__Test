@@ -9,6 +9,15 @@ namespace Core.Connectors.TestConnector;
 public interface ITestRestConnector : IDisposable
 {
     /// <summary>
+    /// Получение Ticker
+    /// </summary>
+    /// <param name="pair"></param>
+    /// <param name="maxCount"></param>
+    /// <param name="cancellationToken">Добален для корректной работы в ассинхронном режиме.</param>
+    /// <returns></returns>
+    Task<Ticker> GetTickerAsync(string pair, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Получение сделок
     /// </summary>
     /// <param name="pair"></param>
