@@ -11,6 +11,7 @@ public static class BitfinexApiConstants
         {
             public const string Trades = "trades/";
             public const string Candles = "candles/";
+            public const string Ticker = "ticker/";
         }
     }
 
