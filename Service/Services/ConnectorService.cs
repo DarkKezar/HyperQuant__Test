@@ -5,7 +5,9 @@ using Core.Models;
 using Service.Entities;
 
 namespace Service.Services;
-
+/// <summary>
+/// Connector в широком смысле, если судить по ТЗ
+/// </summary>
 public class ConnectorService : IConnectorService
 {
     private readonly ITestRestConnector _restConnector;
