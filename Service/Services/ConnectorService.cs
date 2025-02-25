@@ -6,6 +6,9 @@ using Service.Entities;
 
 namespace Service.Services;
 
+/// <summary>
+/// Коннектор в широком смысле
+/// </summary>
 public class ConnectorService : IConnectorService
 {
     private readonly ITestRestConnector _restConnector;
