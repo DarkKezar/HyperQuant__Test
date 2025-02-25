@@ -10,9 +10,10 @@ public class CalculatorController : Controller
     
     private static readonly List<Wallet> testTaskWallets = new List<Wallet>()
     {
-        new Wallet("BTC", (decimal)0.05),
-        new Wallet("XRP", (decimal)1.05),
-        new Wallet("XMR", (decimal)2.05),
+        new Wallet("BTC", (decimal)1.000),
+        new Wallet("XRP", (decimal)15000),
+        new Wallet("XMR", (decimal)50.00),
+        new Wallet("DSH", (decimal)30.00),
     };
 
     public CalculatorController(IConnectorService connectorService)
