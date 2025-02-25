@@ -53,7 +53,7 @@ public class TestRestConnector : ITestRestConnector
 
         if (!result.IsSuccessStatusCode)
         {
-            throw new Exception($"GetNewTradesAsync failed: {endpointUrl}");
+            Console.WriteLine(result.StatusCode);
         }
 
         try
