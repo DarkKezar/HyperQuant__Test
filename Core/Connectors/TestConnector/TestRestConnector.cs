@@ -9,9 +9,9 @@ public class TestRestConnector : ITestRestConnector
 {
     private readonly HttpClient _httpClient;
 
-    public TestRestConnector(HttpClient httpClient)
+    public TestRestConnector(HttpClient httpClient = null)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClient ?? new HttpClient();
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ public class TestRestConnector : ITestRestConnector
 
         if (!result.IsSuccessStatusCode)
         {
-            throw new Exception($"GetNewTradesAsync failed: {endpointUrl}");
+            Console.WriteLine(result.StatusCode);
         }
 
         try

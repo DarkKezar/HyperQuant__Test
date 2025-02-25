@@ -10,7 +10,6 @@ namespace Core.Connectors.TestConnector;
 
 public class TestWsConnector : ITestWSConnector
 {
-    private readonly HttpClient _httpClient;
     private readonly ClientWebSocket _webSocket;
     private CancellationTokenSource _cancellationTokenSource;
     
@@ -24,10 +23,10 @@ public class TestWsConnector : ITestWSConnector
     public event Action<Trade>? NewSellTrade;
     public event Action<Candle>? CandleSeriesProcessing;
     
-    public TestWsConnector(ClientWebSocket webSocket, CancellationTokenSource source)
+    public TestWsConnector(ClientWebSocket webSocket = null, CancellationTokenSource source = null)
     {
-        _webSocket = webSocket;
-        _cancellationTokenSource = source;
+        _webSocket = webSocket ?? new ClientWebSocket();
+        _cancellationTokenSource = source ?? new CancellationTokenSource();
         
         _entityProcessors.Add(BitfinexApiConstants.WebSocketData.Channels.Trades, ProcessTradeMessage);
         _entityProcessors.Add(BitfinexApiConstants.WebSocketData.Channels.Candles, ProcessCandleMessage);
