@@ -9,9 +9,9 @@ public class TestRestConnector : ITestRestConnector
 {
     private readonly HttpClient _httpClient;
 
-    public TestRestConnector(HttpClient httpClient)
+    public TestRestConnector(HttpClient httpClient = null)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClient ?? new HttpClient();
     }
 
     /// <summary>
