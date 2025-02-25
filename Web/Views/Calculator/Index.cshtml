@@ -1,0 +1,66 @@
+@model List<List<Service.Entities.Wallet>>
+@{
+    var sums = new decimal[Model.Count + 1];
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Задание 2</title>
+
+    <style>
+        *, *::before, *::after {
+            padding: 0;
+            margin: 0;
+            
+            box-sizing: border-box;
+        }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        
+        th {
+            padding:  10px 15px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <h2>Задание 2</h2>
+    <table>
+        <thead>
+        <tr>
+            <th></th>
+            @foreach (var header in Model[0])
+            {
+                <th>@header.Currency</th>
+            }
+        </tr>
+        </thead>
+        <tbody>
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <th>@(i + 1)</th>
+                @for (int j = 0; j < Model[i].Count; j++)
+                {
+                    <td>@Model[i][j].Amount</td>
+                    sums[j] += Model[i][j].Amount;
+                }
+            </tr>
+        }
+        <tr>
+            <th><b>Итого</b></th>
+            @for (int i = 0; i < sums.Length; i++)
+            {
+                <td>@sums[i]</td>
+            }
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

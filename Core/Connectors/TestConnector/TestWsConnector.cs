@@ -10,7 +10,6 @@ namespace Core.Connectors.TestConnector;
 
 public class TestWsConnector : ITestWSConnector
 {
-    private readonly HttpClient _httpClient;
     private readonly ClientWebSocket _webSocket;
     private CancellationTokenSource _cancellationTokenSource;
     

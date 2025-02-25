@@ -41,6 +41,8 @@ public static class BitfinexApiConstants
     public static class Symbols
     {
         public const string BtcUsd = "tBTCUSD";
+        
+        public const string Usd = "USD";
         // e.t.c.
     }
 }
